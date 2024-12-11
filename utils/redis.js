@@ -8,8 +8,8 @@ class RedisClient {
       console.error('Redis Client Error:', err);
     });
 
-    this.client.connect().catch((err) => {
-      console.error('Redis Client Connection Error:', err);
+    this.client.on('connect', () => {
+      console.log('Redis client connected successfully.');
     });
   }
 
@@ -19,28 +19,36 @@ class RedisClient {
 
   async get(key) {
     try {
-      return await this.client.get(key);
+      const value = await this.client.get(key);
+      if (value === null) {
+        console.log(`Key "${key}" not found or expired.`);
+      }
+      return value;
     } catch (err) {
-      console.error(`Error getting key ${key}:`, err);
+      console.error(`Error getting key "${key}":`, err);
       return null;
     }
   }
 
   async set(key, value, duration) {
     try {
-      await this.client.set(key, value, {
-        EX: duration,
-      });
+      await this.client.set(key, value, { EX: duration });
+      console.log(`Key "${key}" set successfully with value "${value}" for ${duration} seconds.`);
     } catch (err) {
-      console.error(`Error setting key ${key} with value ${value}:`, err);
+      console.error(`Error setting key "${key}" with value "${value}":`, err);
     }
   }
 
   async del(key) {
     try {
-      await this.client.del(key);
+      const result = await this.client.del(key);
+      if (result === 1) {
+        console.log(`Key "${key}" deleted successfully.`);
+      } else {
+        console.log(`Key "${key}" not found.`);
+      }
     } catch (err) {
-      console.error(`Error deleting key ${key}:`, err);
+      console.error(`Error deleting key "${key}":`, err);
     }
   }
 }
