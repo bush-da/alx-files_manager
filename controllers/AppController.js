@@ -11,13 +11,14 @@ class AppController {
    * @param {express.Response} res - Express response object.
    */
   static async getStatus(req, res) {
-    const status = {
-      redis: redisClient.isAlive(),
-      db: dbClient.isAlive(),
-    };
-    res.status(200).json(status);
-  }
-
+   console.log('Redis Status:', redisClient.isAlive());
+   console.log('DB Status:', dbClient.isAlive());
+   const status = {
+     redis: redisClient.isAlive(),
+     db: dbClient.isAlive(),
+   };
+   res.status(200).json(status);
+ }
   /**
    * Returns the number of users and files in the database.
    * @param {express.Request} req - Express request object.
